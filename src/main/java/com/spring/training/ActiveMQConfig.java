@@ -9,6 +9,6 @@ import org.springframework.context.annotation.Configuration;
 @Data
 public class ActiveMQConfig {
     String brokerUrl;
-    String user;
+    String userName;
     String password;
 }

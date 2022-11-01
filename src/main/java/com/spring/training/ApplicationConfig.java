@@ -55,7 +55,7 @@ public class ApplicationConfig implements JmsListenerConfigurer {
         connectionFactory.setTrustAllPackages(true);
         connectionFactory.setBrokerURL(config.getBrokerUrl());
         connectionFactory.setPassword(config.getPassword());
-        connectionFactory.setUserName(config.getUser());
+        connectionFactory.setUserName(config.getUserName());
         return connectionFactory;
     }
 
