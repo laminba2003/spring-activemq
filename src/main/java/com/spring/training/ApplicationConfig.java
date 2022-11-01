@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.RedeliveryPolicy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.annotation.JmsListenerConfigurer;
@@ -46,17 +47,29 @@ public class ApplicationConfig implements JmsListenerConfigurer {
         factory.setErrorHandler(t -> log.error(t.getCause().getMessage()));
         factory.setMessageConverter(messageConverter());
         factory.setDestinationResolver(destinationResolver());
+        factory.setSessionTransacted(true);
         return factory;
     }
 
     @Bean
     public ActiveMQConnectionFactory connectionFactory() {
-        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
-        connectionFactory.setTrustAllPackages(true);
-        connectionFactory.setBrokerURL(config.getBrokerUrl());
-        connectionFactory.setPassword(config.getPassword());
-        connectionFactory.setUserName(config.getUserName());
-        return connectionFactory;
+        ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory();
+        factory.setTrustAllPackages(true);
+        factory.setBrokerURL(config.getBrokerUrl());
+        factory.setPassword(config.getPassword());
+        factory.setUserName(config.getUserName());
+        factory.setRedeliveryPolicy(redeliveryPolicy());
+        return factory;
+    }
+
+    @Bean
+    public RedeliveryPolicy redeliveryPolicy() {
+        RedeliveryPolicy policy = new RedeliveryPolicy();
+        policy.setInitialRedeliveryDelay(0);
+        policy.setRedeliveryDelay(1000);
+        policy.setUseExponentialBackOff(false);
+        policy.setMaximumRedeliveries(2);
+        return policy;
     }
 
     @Bean
